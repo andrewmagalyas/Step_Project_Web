@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Home</title>
+
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="{% url 'home' %}">Home</a>
+            {% if user.is_authenticated %}
+                <a href="{% url 'profile' %}">Profile</a>
+                <a href="{% url 'history' %}">History</a>
+                <form method="post" action="{% url 'logout' %}">
+                    {% csrf_token %}
+                    <button type="submit">Logout</button>
+                </form>
+            {% else %}
+                <label>You are logged in as a guest. Please log in to your profile</label>
+                <a href="{% url 'login' %}">Login</a>
+                <label>or</label>
+                <a href="{% url 'register' %}">Register</a>
+            {% endif %}
+        </nav>
+    </header>
+
+    <div class="content">
+        <h1>Welcome to the home page!</h1>
+
+        <form method="post">
+            {% csrf_token %}
+            <label for="city">Enter city name:</label>
+            <input type="text" id="city" name="city">
+            <button type="submit">Get Weather</button>
+        </form>
+
+        {% if weather %}
+            <h2>Weather in {{ weather.city }}</h2>
+            <p>Temperature: {{ weather.temperature }}°C</p>
+            <p>Description: {{ weather.description }}</p>
+            <p>Humidity: {{ weather.humidity }}%</p>
+        {% endif %}
+    </div>
+</body>
+</html>
