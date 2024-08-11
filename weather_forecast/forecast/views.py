@@ -31,7 +31,7 @@ def home(request):
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
-            print(data)
+            # print(data)
             weather = {
                 'city': city,
                 'temperature': data['main']['temp'],
