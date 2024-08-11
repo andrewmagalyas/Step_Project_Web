@@ -4,6 +4,7 @@ from .forms import UserRegisterForm
 from .forms import ProfileForm
 from .models import SearchHistory
 from .models import Profile
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from dotenv import load_dotenv
 import os
@@ -17,6 +18,7 @@ def register (request):
         form = UserRegisterForm(request.POST)
         if form.is_valid():
             form.save()
+            messages.success(request, 'Form submitted successfully!')
             return redirect('login')
     else:
         form = UserRegisterForm()
@@ -31,13 +33,15 @@ def home(request):
         response = requests.get(url)
         if response.status_code == 200:
             data = response.json()
-            # print(data)
             weather = {
                 'city': city,
                 'temperature': data['main']['temp'],
                 'description': data['weather'][0]['description'],
                 'humidity': data['main']['humidity']
             }
+            messages.success(request, 'Weather information retrieved successfully.')
+        else:
+            messages.error(request, 'No weather information found for the given city.')
             if request.user.is_authenticated:
                 SearchHistory.objects.create(
                     user=request.user,
