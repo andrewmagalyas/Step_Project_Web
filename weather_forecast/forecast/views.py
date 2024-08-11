@@ -55,7 +55,6 @@ def search_history(request):
     else:
         return redirect('login')
 
-
 @login_required
 def profile(request):
     profile, created = Profile.objects.get_or_create(user=request.user)
