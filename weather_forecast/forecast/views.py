@@ -28,28 +28,32 @@ def home(request):
     weather = None
     if request.method == 'POST':
         city = request.POST.get('city')
-        api_key = API_KEY
-        url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={api_key}'
-        response = requests.get(url)
-        if response.status_code == 200:
-            data = response.json()
-            weather = {
-                'city': city,
-                'temperature': data['main']['temp'],
-                'description': data['weather'][0]['description'],
-                'humidity': data['main']['humidity']
-            }
-            messages.success(request, 'Weather information retrieved successfully.')
+        if not city:
+            messages.error(request, 'Please enter a city name.')
         else:
-            messages.error(request, 'No weather information found for the given city.')
-            if request.user.is_authenticated:
-                SearchHistory.objects.create(
-                    user=request.user,
-                    city=city,
-                    temperature=weather['temperature'],
-                    description=weather['description'],
-                    humidity=weather['humidity']
-                )
+            api_key = API_KEY  # Переконайтеся, що змінна API_KEY визначена
+            url = f'http://api.openweathermap.org/data/2.5/weather?q={city}&units=metric&appid={api_key}'
+            response = requests.get(url)
+            if response.status_code == 200:
+                data = response.json()
+                weather = {
+                    'city': city,
+                    'temperature': data['main']['temp'],
+                    'description': data['weather'][0]['description'],
+                    'humidity': data['main']['humidity']
+                }
+                messages.success(request, 'Weather information retrieved successfully.')
+
+                if request.user.is_authenticated:
+                    SearchHistory.objects.create(
+                        user=request.user,
+                        city=city,
+                        temperature=weather['temperature'],
+                        description=weather['description'],
+                        humidity=weather['humidity']
+                    )
+            else:
+                messages.error(request, 'No weather information found for the given city.')
     return render(request, 'home.html', {'weather': weather})
 
 def search_history(request):
